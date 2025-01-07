@@ -1,0 +1,41 @@
+version: '3.9'
+services:
+  db:
+    image: postgres:15
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: library
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - app_network
+
+  backend:
+    build: ./backend
+    container_name: backend_app
+    ports:
+      - "3001:3001"
+    depends_on:
+      - db
+    networks:
+      - app_network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend_app
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - app_network
+
+volumes:
+  db_data:
+
+networks:
+  app_network:
